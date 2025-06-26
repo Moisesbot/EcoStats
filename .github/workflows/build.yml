@@ -1,0 +1,37 @@
+name: Build Plugin from ZIP
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install unzip
+        run: sudo apt-get update && sudo apt-get install unzip -y
+
+      - name: Unzip plugin source
+        run: unzip EcoStats_plugin.zip -d EcoStats
+
+      - name: Build plugin with Maven
+        working-directory: EcoStats
+        run: mvn clean package
+
+      - name: Upload compiled plugin
+        uses: actions/upload-artifact@v4
+        with:
+          name: EcoStatsPlugin
+          path: EcoStats/target/*.jar
+          
